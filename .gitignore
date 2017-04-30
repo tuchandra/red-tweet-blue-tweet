@@ -1,6 +1,7 @@
-# Credentials, data
+# Credentials, data, papers
 credentials.json
 *.txt
+*.pdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
