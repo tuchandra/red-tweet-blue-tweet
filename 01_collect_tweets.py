@@ -1,3 +1,6 @@
+"""Use Twitter Streaming API to collect tweets about a particular subject.
+Run the stream for an hour, and store the tweets to a JSON file."""
+
 import time
 
 from tweepy.streaming import StreamListener
