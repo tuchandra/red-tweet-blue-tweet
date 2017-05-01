@@ -37,13 +37,13 @@ class FileOutputListener(StreamListener):
 
 if __name__ == "__main__":
     # Setup output file
-    t = time.strftime("%m%d_%H%M%S", time.localtime())
+    t = time.strftime("tweets_%m%d_%H%M%S", time.localtime())
     with open("{0}.json".format(t), "a") as output_file:
         # Create and authorize listener
-        listener = FileOutputListener(10, output_file)
+        listener = FileOutputListener(3600, output_file)
         auth = authorize()
         stream = Stream(auth, listener)
 
         # Filter tweets with keywords
-        keywords = ["trump"]
+        keywords = ["1mayis", "mayday"]
         twitterator = stream.filter(track = keywords)

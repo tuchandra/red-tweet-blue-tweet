@@ -44,7 +44,9 @@ if __name__ == "__main__":
                 except:
                     continue
 
-            csv_name = "users_" + fname.split(".")[0] + ".csv"
+            # tweet collection was named tweets_mmdd_hhmmss.json
+            # make csv file users_mmdd_hhmmss.csv
+            csv_name = "users_" + fname[7:].split(".")[0] + ".csv"
             with open(csv_name, "w") as csv_file:
                 cw = csv.writer(csv_file)
                 for user  in user_set:
