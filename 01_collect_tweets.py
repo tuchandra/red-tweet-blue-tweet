@@ -1,6 +1,7 @@
 """Use Twitter Streaming API to collect tweets about a particular subject.
 Run the stream for an hour, and store the tweets to a JSON file."""
 
+import sys
 import time
 
 from tweepy.streaming import StreamListener
@@ -39,14 +40,29 @@ class FileOutputListener(StreamListener):
 
 
 if __name__ == "__main__":
-    # Setup output file
-    t = time.strftime("tweets_%m%d_%H%M%S", time.localtime())
-    with open("{0}.json".format(t), "a") as output_file:
-        # Create and authorize listener
-        listener = FileOutputListener(3540, output_file)
-        auth = authorize()
-        stream = Stream(auth, listener)
+    # Filter tweets with keywords
+    keywords = ["trump", "comey", "FBI", "russia", "putin"]
 
-        # Filter tweets with keywords
-        keywords = ["1mayis", "mayday"]
-        twitterator = stream.filter(track = keywords)
+    while True:
+        # Setup output file
+        t = time.strftime("tweets_%m%d_%H%M%S", time.localtime())
+
+        # Have stream open for as long as possible
+        try:
+            with open("{0}.json".format(t), "a") as output_file:
+                # Create and authorize listener
+                listener = FileOutputListener(3540, output_file)  # 59 mins
+                auth = authorize()
+                stream = Stream(auth, listener)
+
+                twitterator = stream.filter(track = keywords)
+
+        # Allow usual keys to still kill the script
+        except KeyboardInterrupt:
+            sys.exit()
+
+        # On other exceptions, attempt to restart stream
+        # Probably should act based on error code, but hopefully you don't
+        # get in trouble with Twitter
+        except Exception as e:
+            pass
