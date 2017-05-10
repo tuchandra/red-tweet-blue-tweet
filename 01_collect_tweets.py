@@ -42,21 +42,32 @@ class FileOutputListener(StreamListener):
 if __name__ == "__main__":
     # Filter tweets with keywords
     keywords = ["trump", "comey", "FBI", "russia", "putin"]
+    
+    start_time = time.time()
+    total_runtime = 60*60 - 60*1 
 
     while True:
         # Setup output file
         t = time.strftime("tweets_%m%d_%H%M%S", time.localtime())
 
-        # Have stream open for as long as possible
+
         try:
             with open("{0}.json".format(t), "a") as output_file:
+                # This script is designed to run for one hour. To achieve
+                # this, have an initial 1 hour time limit, but subtract off
+                # the time the script has already been running (in case an
+                # old listener crashed, for instance).
+                time_limit = total_runtime - (time.time() - start_time)
+
+                if time_limit < 0:
+                    sys.exit()
+
                 # Create and authorize listener
-                time_limit = 60*60*4 - 1  # time in minutes
                 listener = FileOutputListener(time_limit, output_file)
                 auth = authorize()
                 stream = Stream(auth, listener)
 
-                twitterator = stream.filter(track = keywords)
+                stream.filter(track = keywords)
 
         # Allow usual keys to still kill the script
         except KeyboardInterrupt:
