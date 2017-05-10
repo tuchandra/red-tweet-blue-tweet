@@ -51,7 +51,8 @@ if __name__ == "__main__":
         try:
             with open("{0}.json".format(t), "a") as output_file:
                 # Create and authorize listener
-                listener = FileOutputListener(3540, output_file)  # 59 mins
+                time_limit = 60*60*4 - 1  # time in minutes
+                listener = FileOutputListener(time_limit, output_file)
                 auth = authorize()
                 stream = Stream(auth, listener)
 
