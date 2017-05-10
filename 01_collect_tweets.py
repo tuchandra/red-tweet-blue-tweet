@@ -1,5 +1,8 @@
 """Use Twitter Streaming API to collect tweets about a particular subject.
-Run the stream for an hour, and store the tweets to a JSON file."""
+Run the stream for an hour, and store the tweets to a JSON file.
+
+This script is designed to be run once every hour. Because of this, the
+stream disconnects after an hour, and the script will end after an hour."""
 
 import sys
 import time
@@ -67,7 +70,11 @@ if __name__ == "__main__":
                 auth = authorize()
                 stream = Stream(auth, listener)
 
-                stream.filter(track = keywords)
+                twitterator = stream.filter(track = keywords)
+
+                # If the listener returns False, time is up; done streaming.
+                if not twitterator:
+                    break
 
         # Allow usual keys to still kill the script
         except KeyboardInterrupt:
