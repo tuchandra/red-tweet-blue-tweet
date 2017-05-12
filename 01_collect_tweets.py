@@ -4,6 +4,7 @@ Run the stream for an hour, and store the tweets to a JSON file.
 This script is designed to be run once every hour. Because of this, the
 stream disconnects after an hour, and the script will end after an hour."""
 
+import pathlib
 import sys
 import time
 
@@ -49,10 +50,12 @@ if __name__ == "__main__":
     start_time = time.time()
     total_runtime = 60*60 - 60*1 
 
+    path = os.path.abspath("../../../raid")
+
     while True:
         try:
             # Setup output file
-            t = time.strftime("tweets_%m%d_%H%M%S", time.localtime())
+            t = time.strftime(path + "/tweets_%m%d_%H%M%S", time.localtime())
             with open("{0}.json".format(t), "a") as output_file:
                 # This script is designed to run for one hour. To achieve
                 # this, have an initial 1 hour time limit, but subtract off
