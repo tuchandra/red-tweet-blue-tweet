@@ -44,7 +44,7 @@ class FileOutputListener(StreamListener):
 
 if __name__ == "__main__":
     # Filter tweets with keywords
-    keywords = ["trump", "comey", "FBI", "russia", "putin"]
+    keywords = ["trump", "comey", "FBI", "russia", "putin", "justice", "department"]
     
     start_time = time.time()
     total_runtime = 60*60 - 60*1 
