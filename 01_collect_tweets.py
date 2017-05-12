@@ -50,11 +50,9 @@ if __name__ == "__main__":
     total_runtime = 60*60 - 60*1 
 
     while True:
-        # Setup output file
-        t = time.strftime("tweets_%m%d_%H%M%S", time.localtime())
-
-
         try:
+            # Setup output file
+            t = time.strftime("tweets_%m%d_%H%M%S", time.localtime())
             with open("{0}.json".format(t), "a") as output_file:
                 # This script is designed to run for one hour. To achieve
                 # this, have an initial 1 hour time limit, but subtract off
