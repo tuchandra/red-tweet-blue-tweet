@@ -4,7 +4,7 @@ Run the stream for an hour, and store the tweets to a JSON file.
 This script is designed to be run once every hour. Because of this, the
 stream disconnects after an hour, and the script will end after an hour."""
 
-import pathlib
+import pathlib  
 import sys
 import time
 
@@ -45,12 +45,12 @@ class FileOutputListener(StreamListener):
 
 if __name__ == "__main__":
     # Filter tweets with keywords
-    keywords = ["trump", "comey", "FBI", "russia", "putin", "justice", "department"]
+    keywords = ["trump", "comey", "FBI", "justice", "department"]
     
     start_time = time.time()
     total_runtime = 60*60 - 60*1 
 
-    path = os.path.abspath("../../../raid")
+    path = os.path.abspath("../../../raid/RT82540")
 
     while True:
         try:
@@ -85,4 +85,5 @@ if __name__ == "__main__":
         # Probably should act based on error code, but hopefully you don't
         # get in trouble with Twitter
         except Exception as e:
+            print(e)
             pass
