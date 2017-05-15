@@ -4,7 +4,7 @@ Run the stream for an hour, and store the tweets to a JSON file.
 This script is designed to be run once every hour. Because of this, the
 stream disconnects after an hour, and the script will end after an hour."""
 
-import pathlib  
+import os
 import sys
 import time
 
