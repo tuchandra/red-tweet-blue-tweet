@@ -67,8 +67,6 @@ def copy_sample(client, col1, col2, number = 10000):
 def drop_duplicates(client, collection):
     """Drop duplicate tweets (based on "id") from a collection."""
 
-    tweets = client["twitter"]["tweets_small"]
-
     # Reference: https://stackoverflow.com/a/33151782
     pipeline = [{ "$group" : { "_id" : { "tweet_id" : "$id" },
                                "uniqueIDs" : { "$addToSet" : "$_id" },
@@ -77,7 +75,7 @@ def drop_duplicates(client, collection):
                 { "$match" : { "count" : { "$gt" : 1 }}
                 }]
 
-    cursor = tweets.aggregate(pipeline, allowDiskUse = True)
+    cursor = collection.aggregate(pipeline, allowDiskUse = True)
 
     # Cursor is a generator that has elements 
     # {"uniqueIDs" : [xx, xx, xx], "count" : yy, "_id" : {"tweet_id": zz}}
@@ -95,13 +93,11 @@ def drop_duplicates(client, collection):
             results.append(pymongo.DeleteOne({ "_id" : tweet_id }))
 
     # Remove them all
-    # tweets.bulk_write(requests)
+    write_result = collection.bulk_write(results)
 
 
-def count_distinct(client):
+def count_distinct(client, collection):
     """Count the number of distinct tweets (by "id") in a collection."""
-
-    tweets = client["twitter"]["tweets_small"]
 
     # Reference: https://gist.github.com/eranation/3241616
     pipeline = [{ "$group" : { "_id" : "$id"}},
@@ -109,8 +105,10 @@ def count_distinct(client):
                                "count" : { "$sum" : 1}}}
                ]
 
-    for doc in tweets.aggregate(pipeline, allowDiskUse = True):
+    for doc in collection.aggregate(pipeline, allowDiskUse = True):
         print(doc)
+
+    print(collection.count())
 
 
 if __name__ == "__main__":
@@ -122,5 +120,5 @@ if __name__ == "__main__":
 
     # store_tweets(client)
     # copy_sample(client, tweets, tweets_small, 10000)
-    # count_distinct(client, tweets_small)
-    # drop_duplicates(client, tweets_small)
+    # count_distinct(client, tweets)
+    # drop_duplicates(client, tweets)
