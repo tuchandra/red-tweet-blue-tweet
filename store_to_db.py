@@ -1,6 +1,14 @@
 """Store the tweets contained in JSON files into a database. This assumes that
 MongoDB is installed and listening on localhost, and that the tweets are all
 stored in one directory (the path to which must be modified appropriately).
+
+This script assumes several things:
+ - MongoDB is listening on localhost/27017 (can be configured in __main__)
+ - database of tweets is called "twitter", collection called "tweets", and
+   a smaller testing connection is "tweets_small" (can be configured at
+   the top of store_tweets() and in __main__)
+ - JSON files are stored in ../../../raid/RT82540 (can be configured in
+   store_tweets())
 """
 
 import json
@@ -9,10 +17,12 @@ import sys
 
 import pymongo
 
+
 def store_tweets(client):
     """Read all JSON files and store all tweets to the database.
 
-    client: pymongo.MongoClient to connect to"""
+    client: pymongo.MongoClient to connect to
+    """
 
     # Create collection of tweets
     if "tweets" not in client["twitter"].collection_names():
@@ -39,43 +49,27 @@ def store_tweets(client):
         print("Wrote tweets from {} into database.".format(tweet_file))
 
 
-def copy_sample(client, num = 10000):
-    """Copy a sample of tweets to another collection."""
+def copy_sample(client, col1, col2, number = 10000):
+    """Copy a sample of tweets from one collection to another.
 
-    tweets = client["twitter"]["tweets"]
-    new_collection = client["twitter"]["tweets_small"]
+    client: pymongo.MongoClient to connect to
+    col1: source collection
+    col2: target collection
+    number: number of tweets to transfer
+    """
 
-    pipeline = [{ "$sample" : {"size" : num}}]
-    new_collection.insert_many(tweets.aggregate(pipeline))
+    pipeline = [{ "$sample" : {"size" : number}}]
+    col2.insert_many(col1.aggregate(pipeline))
 
     return
 
 
-def drop_duplicates(client):
-    """Drop duplicate tweet IDs from the database.
-
-    Assumption: using database name "twitter" and collection name "tweets".
-
-    client: pymongo.MongoClient to connect to"""
+def drop_duplicates(client, collection):
+    """Drop duplicate tweets (based on "id") from a collection."""
 
     tweets = client["twitter"]["tweets_small"]
 
-    # Reference: https://stackoverflow.com/a/34738547
-    # Group tweets by ID, and put into groups with like IDs. Then keep the
-    # tweet-groups that have >= 2 elements (i.e., duplicates)
-    pipeline = [ {"$group" : {"_id": "$id", 
-                              "count": {"$sum": 1}, 
-                              "ids": {"$push": "$id"}}},
-                 {"$match" : {"count": {"gte": 2}}}
-               ]
-
-    requests = []
-    for document in tweets.aggregate(pipeline, allowDiskUse = True):
-        it = iter(document["ids"])
-        next(it)
-        for id in it:
-            requests.append(pymongo.DeleteOne({"_id": id}))
-
+    # Reference: https://stackoverflow.com/a/33151782
     pipeline = [{ "$group" : { "_id" : { "tweet_id" : "$id" },
                                "uniqueIDs" : { "$addToSet" : "$_id" },
                                "count" : { "$sum" : 1 }}
@@ -85,24 +79,27 @@ def drop_duplicates(client):
 
     cursor = tweets.aggregate(pipeline, allowDiskUse = True)
 
-    #while (next(cur)):
+    # Cursor is a generator that has elements 
+    # {"uniqueIDs" : [xx, xx, xx], "count" : yy, "_id" : {"tweet_id": zz}}
+    # the uniqueIDs are what identifies the record in the collection, but
+    # the tweet_id is what the tweet's ID actually is.
+    # 
+    # We only want one record for each tweet_id.
 
-    requests = []
-    for document in tweets.aggregate(pipeline, allowDiskUse = True):
-        it = iter(document)
-        next(it)
+    results = []
+    for doc in cursor:
+        tweet_ids = doc["uniqueIDs"]
 
-        i = 1
-        while i < len(document["uniqueIDs"]):
-            requests.append(pymongo.DeleteOne({"id" : document["uniqueIDs"][i]}))
-            i += 1
+        # Gather all duplicate tweets except the first
+        for tweet_id in tweet_ids[1:]:
+            results.append(pymongo.DeleteOne({ "_id" : tweet_id }))
 
-    print(r)
+    # Remove them all
+    # tweets.bulk_write(requests)
 
-    # r = tweets.bulk_write(requests)
 
 def count_distinct(client):
-    """Count the number of distinct tweets (by tweet ID) in collection."""
+    """Count the number of distinct tweets (by "id") in a collection."""
 
     tweets = client["twitter"]["tweets_small"]
 
@@ -112,7 +109,6 @@ def count_distinct(client):
                                "count" : { "$sum" : 1}}}
                ]
 
-
     for doc in tweets.aggregate(pipeline, allowDiskUse = True):
         print(doc)
 
@@ -121,7 +117,10 @@ if __name__ == "__main__":
     # Connect to database
     client = pymongo.MongoClient("localhost", 27017)
 
+    tweets = client["twitter"]["tweets"]
+    tweets_small = client["twitter"]["tweets_small"]
+
     # store_tweets(client)
-    # drop_duplicates(client)
-    count_distinct(client)
-    # copy_sample(client, 10000)
+    # copy_sample(client, tweets, tweets_small, 10000)
+    # count_distinct(client, tweets_small)
+    # drop_duplicates(client, tweets_small)
