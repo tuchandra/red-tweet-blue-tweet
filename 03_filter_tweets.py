@@ -41,6 +41,7 @@ def transfer_tweets(client, source, dest):
         # Attempt to insert into target, unless we violate uniqueness
         try:
             dest.insert_one(document)
+            source.delete-one(document)
         except pymongo.errors.DuplicateKeyError:
             continue
 
