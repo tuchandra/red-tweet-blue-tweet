@@ -49,14 +49,17 @@ def store_tweets(client):
         print("Wrote tweets from {} into database.".format(tweet_file))
 
 
-def copy_sample(client, col1, col2, number = 10000):
+def copy_sample(client, source_name, dest_name, number = 10000):
     """Copy a sample of tweets from one collection to another.
 
     client: pymongo.MongoClient to connect to
-    col1: source collection
-    col2: target collection
+    source_name: source collection name
+    dest_name: target collection name
     number: number of tweets to transfer
     """
+
+    col1 = client["twitter"][source_name]
+    col2 = client["twitter"][dest_name]
 
     pipeline = [{ "$sample" : {"size" : number}}]
     col2.insert_many(col1.aggregate(pipeline))
@@ -83,9 +86,6 @@ if __name__ == "__main__":
     # Connect to database
     client = pymongo.MongoClient("localhost", 27017)
 
-    tweets = client["twitter"]["tweets"]
-    tweets_small = client["twitter"]["tweets_small"]
-
     # store_tweets(client)
-    # copy_sample(client, tweets, tweets_small, 10000)
+    # copy_sample(client, "tweets_filtered", "tweets_small", 10000)
     # count_distinct(client, tweets)
