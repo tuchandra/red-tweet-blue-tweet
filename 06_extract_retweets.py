@@ -12,6 +12,9 @@ def export_retweets(client, collection_name):
     retweets = {}
 
     for i, tweet in enumerate(col.find({"retweeted_status": {"$exists" : True}}, no_cursor_timeout = True)):
+        if i % 10000 == 0:
+            print("Processed {} tweets".format(i))
+
         # Extract date and IDs of original user / retweeting user
         try:
             timestamp = time.strptime(tweet["created_at"], "%a %b %d %H:%M:%S +0000 %Y")
