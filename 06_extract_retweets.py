@@ -1,6 +1,9 @@
-"""DO THIS"""
+"""Extract retweets from all of the filtered tweets.
+
+"""
 
 import csv
+import os
 import time
 
 import pymongo
@@ -12,7 +15,7 @@ def export_retweets(client, collection_name):
     retweets = {}
 
     for i, tweet in enumerate(col.find({"retweeted_status": {"$exists" : True}}, no_cursor_timeout = True)):
-        if i % 10000 == 0:
+        if i % 50000 == 0:
             print("Processed {} tweets".format(i))
 
         # Extract date and IDs of original user / retweeting user
@@ -36,7 +39,7 @@ def export_retweets(client, collection_name):
 
     # Write all of the retweet lists to files.
     for date, tweets in retweets.items():
-        fname = "retweets_{0}.csv".format(date)
+        fname = "retweet_lists/retweets_{0}.csv".format(date)
         with open(fname, "w") as f:
             writer = csv.writer(f)
             for tweet in tweets:
@@ -48,10 +51,11 @@ def export_retweets(client, collection_name):
 
 if __name__ == "__main__":
     client = pymongo.MongoClient("localhost", 27017)
+
+    # Create output directory if it doesn't exist
+    try:
+        os.mkdir("retweet_lists")
+    except OSError:
+        pass
+
     export_retweets(client, "tweets_filtered")
-
-
-
-
-
-
