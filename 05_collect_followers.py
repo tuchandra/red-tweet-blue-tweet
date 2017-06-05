@@ -37,44 +37,49 @@ def get_followers(auth):
     all_accounts = itertools.chain(congress, governors)
 
     # Get followers for each account; write to CSV
-    for acct in all_accounts:
+    for i, acct in enumerate(all_accounts):
         user_id = acct.id_str
         username = acct.name
 
-        # Keep those with at least 5000 followers
-        if acct.followers_count < 5000:
+        try:
+            # Keep those with at least 5000 followers
+            if acct.followers_count < 5000:
+                print("{0}: Skipped {1} / {2} (too few)".format(i, user_id, username))
+                continue
+
+            # For time purposes, ignore those with over 100k followers
+            # This cuts the runtime by 75% (due to rate limiting)
+            if acct.followers_count > 100000:
+                print("{0}: Skipped {1} / {2} (too many)".format(i, user_id, username))
+                continue
+
+            # If we already made the followers list, skip it (because script may
+            # be restarted occasionally)
+            fname = "followers_lists/{}.csv".format(user_id)
+            possible_file = pathlib.Path(fname)
+            if possible_file.is_file():
+                print("{0}: Skipped {1} / {2} (already have)".format(i, user_id, username))
+                continue
+
+            print("{0}: Processing {1} / {2}".format(i, user_id, username))
+
+            # Collect list of followers
+            followers = []
+            for page in tweepy.Cursor(api.followers_ids, id = user_id).pages():
+                followers.extend(page)
+                time.sleep(60)
+
+            # Write list of followers to CSV
+            fname = "followers_lists/{}.csv".format(user_id)
+            with open(fname, "w") as outfile:
+                writer = csv.writer(outfile)
+                for follower in followers:
+                    writer.writerow([follower])
+
+            print("{0}: Got followers for {1} / {2}".format(i, user_id, username))
+        except UnicodeEncodeError:
+            print("{0}: Skipped {1} (unicode)".format(i, user_id))
             continue
-
-        # For time purposes, ignore those with over 100k followers
-        # This cuts the runtime by 75% (due to rate limiting)
-        if acct.followers_count > 100000:
-            print("Skipped {0} / {1} (too many)".format(user_id, username))
-            continue
-
-        # If we already made the followers list, skip it (because script may
-        # be restarted occasionally)
-        fname = "followers_lists/{}.csv".format(user_id)
-        possible_file = pathlib.Path(fname)
-        if possible_file.is_file():
-            print("Skipped {0} / {1} (already have)".format(user_id, username))
-            continue
-
-        print("Processing {0} / {1}".format(user_id, username))
-
-        # Collect list of followers
-        followers = []
-        for page in tweepy.Cursor(api.followers_ids, id = user_id).pages():
-            followers.extend(page)
-            time.sleep(60)
-
-        # Write list of followers to CSV
-        fname = "followers_lists/{}.csv".format(user_id)
-        with open(fname, "w") as outfile:
-            writer = csv.writer(outfile)
-            for follower in followers:
-                writer.writerow([follower])
-
-        print("Got followers for {0} / {1}".format(user_id, username))
 
 
 if __name__ == "__main__":
