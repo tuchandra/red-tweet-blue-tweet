@@ -38,16 +38,17 @@ def get_followers(auth):
 
     # Get followers for each account; write to CSV
     for acct in all_accounts:
+        user_id = acct.id_str
+
         # Keep those with at least 5000 followers
         if acct.followers_count < 5000:
             continue
 
         # For time purposes, ignore those with over 100k followers
+        # This cuts the runtime by 75% (due to rate limiting)
         if acct.followers_count > 100000:
             print("Skipped {}".format(acct.id_str))
             continue
-
-        user_id = acct.id_str
 
         # If we already made the followers list, skip it (because script may
         # be restarted occasionally)
@@ -56,6 +57,7 @@ def get_followers(auth):
         if possible_file.is_file():
             continue
 
+        # Collect list of followers
         followers = []
         for page in tweepy.Cursor(api.followers_ids, id = user_id).pages():
             followers.extend(page)
