@@ -39,6 +39,7 @@ def get_followers(auth):
     # Get followers for each account; write to CSV
     for acct in all_accounts:
         user_id = acct.id_str
+        username = acct.name
 
         # Keep those with at least 5000 followers
         if acct.followers_count < 5000:
@@ -47,7 +48,7 @@ def get_followers(auth):
         # For time purposes, ignore those with over 100k followers
         # This cuts the runtime by 75% (due to rate limiting)
         if acct.followers_count > 100000:
-            print("Skipped {}".format(acct.id_str))
+            print("Skipped {0} / {1}".format(user_id, username))
             continue
 
         # If we already made the followers list, skip it (because script may
@@ -55,6 +56,7 @@ def get_followers(auth):
         fname = "followers_lists/{}.csv".format(user_id)
         possible_file = pathlib.Path(fname)
         if possible_file.is_file():
+            print("Skipped {0} / {1}".format(user_id, username))
             continue
 
         # Collect list of followers
@@ -70,7 +72,7 @@ def get_followers(auth):
             for follower in followers:
                 writer.writerow([follower])
 
-        print("Got followers for {0} / {1}".format(user_id, acct.name))
+        print("Got followers for {0} / {1}".format(user_id, username))
 
 
 if __name__ == "__main__":
