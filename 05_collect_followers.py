@@ -4,7 +4,9 @@
 import csv
 import itertools
 import os
+import pathlib
 
+import time
 import tweepy
 
 from auth import authorize
@@ -22,17 +24,17 @@ def get_followers(auth):
     """
 
     # Authorize API
-    api = tweepy.API(auth)
+    api = tweepy.API(auth, wait_on_rate_limit = True, wait_on_rate_limit_notify = True)
 
     congress = tweepy.Cursor(api.list_members, "cspan", "members-of-congress").items()
     governors = tweepy.Cursor(api.list_members, "cspan", "governors").items()
-    other_accts = ["BarackObama", "JoeBiden", "realDonaldTrump", "POTUS",
-                   "FLOTUS", "VP", "SecondLady", "WhiteHouse", "GOPLeader",
-                   "PressSec", "BetsyDeVos", "MichelleObama", "BernieSanders",
-                   "nytimes", "FoxNews", "NPR", "CNN", "NPR", "maddow",
-                   "rushlimbaugh", "glennbeck"]
+#     other_accts = ["BarackObama", "JoeBiden", "realDonaldTrump", "POTUS",
+#                    "FLOTUS", "VP", "SecondLady", "WhiteHouse", "GOPLeader",
+#                    "PressSec", "BetsyDeVos", "MichelleObama", "BernieSanders",
+#                    "nytimes", "FoxNews", "NPR", "CNN", "NPR", "maddow",
+#                    "rushlimbaugh", "glennbeck"]
 
-    all_accounts = itertools.chain(congress, governors, other_accts)
+    all_accounts = itertools.chain(congress, governors)
 
     # Get followers for each account; write to CSV
     for acct in all_accounts:
@@ -40,8 +42,24 @@ def get_followers(auth):
         if acct.followers_count < 5000:
             continue
 
+        # For time purposes, ignore those with over 100k followers
+        if acct.followers_count > 100000:
+            print("Skipped {}".format(acct.id_str))
+            continue
+
         user_id = acct.id_str
-        followers = acct.followers_ids()
+
+        # If we already made the followers list, skip it (because script may
+        # be restarted occasionally)
+        fname = "followers_lists/{}.csv".format(user_id)
+        possible_file = pathlib.Path(fname)
+        if possible_file.is_file():
+            continue
+
+        followers = []
+        for page in tweepy.Cursor(api.followers_ids, id = user_id).pages():
+            followers.extend(page)
+            time.sleep(60)
 
         # Write list of followers to CSV
         fname = "followers_lists/{}.csv".format(user_id)
@@ -49,6 +67,8 @@ def get_followers(auth):
             writer = csv.writer(outfile)
             for follower in followers:
                 writer.writerow([follower])
+
+        print("Got followers for {0} / {1}".format(user_id, acct.name))
 
 
 if __name__ == "__main__":
