@@ -48,7 +48,7 @@ def get_followers(auth):
         # For time purposes, ignore those with over 100k followers
         # This cuts the runtime by 75% (due to rate limiting)
         if acct.followers_count > 100000:
-            print("Skipped {0} / {1}".format(user_id, username))
+            print("Skipped {0} / {1} (too many)".format(user_id, username))
             continue
 
         # If we already made the followers list, skip it (because script may
@@ -56,8 +56,10 @@ def get_followers(auth):
         fname = "followers_lists/{}.csv".format(user_id)
         possible_file = pathlib.Path(fname)
         if possible_file.is_file():
-            print("Skipped {0} / {1}".format(user_id, username))
+            print("Skipped {0} / {1} (already have)".format(user_id, username))
             continue
+
+        print("Processing {0} / {1}".format(user_id, username))
 
         # Collect list of followers
         followers = []
