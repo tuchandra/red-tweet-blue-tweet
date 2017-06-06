@@ -5,10 +5,9 @@ operations on the database. Use this as a utilities file, modify the __main__
 block, and run when necessary.
 
 This script assumes:
+ - JSON files are stored in ../../../raid/RT82540 (change in store_tweets())
  - MongoDB is listening on localhost/27017
- - The database is called "twitter" with collections "tweets" (original)
-   and "tweeets_small" (for testing)
- - JSON files are stored in ../../../raid/RT82540 (configure in store_tweets())
+ - The database of interest is called "twitter"
 """
 
 import json
@@ -67,8 +66,10 @@ def copy_sample(client, source_name, dest_name, number = 10000):
     return
 
 
-def count_distinct(client, collection):
+def count_distinct(client, col_name):
     """Count the number of distinct tweets (by "id") in a collection."""
+
+    collection = client["twitter"][col_name]
 
     # Reference: https://gist.github.com/eranation/3241616
     pipeline = [{ "$group" : { "_id" : "$id"}},
@@ -88,4 +89,4 @@ if __name__ == "__main__":
 
     # store_tweets(client)
     # copy_sample(client, "tweets_filtered", "tweets_small", 10000)
-    # count_distinct(client, tweets)
+    # count_distinct(client, "tweets_filtered")

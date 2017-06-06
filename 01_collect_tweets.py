@@ -1,8 +1,15 @@
-"""Use Twitter Streaming API to collect tweets about a particular subject.
-Run the stream for an hour, and store the tweets to a JSON file.
+"""Collect tweets about a subject; run stream for an hour and save to JSON.
 
-This script is designed to be run once every hour. Because of this, the
-stream disconnects after an hour, and the script will end after an hour."""
+Use the Twitter Streaming API to do this; requires that authorization be
+properly setup (see authorize.py) so that one can use the API.
+
+Important: The script is designed to be run once every hour. Because of this,
+the stream will disconnect and the script will end after an hour.
+
+Assumptions:
+ - output directory for tweets is ../../../raid/RT82540; change appropriately
+ - keywords of interest are "trump," "comey," etc.; change appropriately
+"""
 
 import os
 import sys
