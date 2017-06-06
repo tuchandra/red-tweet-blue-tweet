@@ -1,10 +1,17 @@
 #===============================================================
 # Create the adjacency matrix indicating which of our users
-# follow which politicians.
+# follow which politicians, and do the correspondence analysis
+# to generate the adjacency matrix.
+#
+# This script assumes:
+#  - followers lists are stored in folder followers_lists/
+#  - user list is stored in user_list.csv
+#
 #===============================================================
 
 library(Matrix)
 library(methods)  # it doesn't work without this, not sure why
+library(ca)
 
 #===============================================================
 # CENSUS: M = 443
@@ -12,7 +19,7 @@ library(methods)  # it doesn't work without this, not sure why
 # representatives, and governors)
 #===============================================================
 
-outfolder <- "followers_lists/" # followers_lists_new
+outfolder <- "followers_lists/"
 files <- list.files(outfolder, full.names = TRUE)
 census <- gsub(".*/(.*).csv", files, repl = "\\1")
 
@@ -63,4 +70,16 @@ x <- sparseMatrix(i = rows, j = columns)
 rownames(x) <- users[1:n]
 colnames(x) <- census[1:m]
 
-save(x, file="sparse_matrix.Rdata")
+save(x, file="adj_matrix.Rdata")
+
+#===============================================================
+# CORRESPONDENCE ANALYSIS
+# Construct the matrix of users who follow at least 5 of the
+# politicians identified above.
+#===============================================================
+
+x <- x[rowSums(x) > 4, ]
+x <- as.matrix(x)
+result <- ca(x, nd = 3)
+
+save(result, file="correspondence.Rdata")
