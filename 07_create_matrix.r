@@ -26,8 +26,9 @@ m <- length(census)
 # Cast users to a one-dimensional list
 users <- read.csv("user_list.csv", colClasses = c("numeric", "NULL"))
 users <- users[0:nrow(users), ]
+save(users, file = "users_list.Rdata")
 
-n <- nrow(users)
+n <- length(users)
 
 #===============================================================
 # CREATE MATRIX
