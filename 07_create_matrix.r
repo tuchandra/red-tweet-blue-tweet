@@ -1,11 +1,10 @@
-#===========
-# 07_create_matrix.r
-# Purpose: Unclear?
-# ADD MORE WORDS HERE
-#===========
+#===============================================================
+# Create the adjacency matrix indicating which of our users
+# follow which politicians.
+#===============================================================
 
 library(Matrix)
-library(methods)
+library(methods)  # it doesn't work without this, not sure why
 
 #===============================================================
 # CENSUS: M = 443
@@ -26,7 +25,7 @@ m <- length(census)
 
 # Cast users to a one-dimensional list
 users <- read.csv("user_list.csv", colClasses = c("numeric", "NULL"))
-users <- users[0:n, ]
+users <- users[0:nrow(users), ]
 
 n <- nrow(users)
 
@@ -34,6 +33,7 @@ n <- nrow(users)
 # CREATE MATRIX
 # Rows: users from collection (nrow = 2839448)
 # Columns: politicians (ncol = 443)
+# x[i][j] will be 1 if user i follows politician j
 #===============================================================
 
 rows <- list()
@@ -59,7 +59,7 @@ columns <- unlist(columns)
 
 # Prepare matrix. Rows are users from our collection; columns are politicians.
 x <- sparseMatrix(i = rows, j = columns)
-rownames(x) <- users[1:dim(x)[1]]
+rownames(x) <- users[1:n]
 colnames(x) <- census[1:m]
 
 save(x, file="sparse_matrix.Rdata")
