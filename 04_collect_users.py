@@ -15,12 +15,8 @@ def export_userlist(client, collection_name):
     data = client["twitter"][collection_name].find(no_cursor_timeout = True)
     count = data.count()
 
-    i = 0
     users = {}
-    for tweet in data:
-        # Track processed documents (enumerate didn't work for some reason)
-        i += 1
-
+    for i, tweet in enumerate(data):
         # Maintain users as hashmap of (user:number of tweets)
         try:
             users[tweet["user"]["id_str"]] += 1
@@ -31,7 +27,7 @@ def export_userlist(client, collection_name):
             print("Processed {0}/{1} tweets; have {2} users".format(i, count, len(users.keys())))
 
     with open("user_list.csv", "w") as outfile:
-        writer = csv.writer(csv_file)
+        writer = csv.writer(outfile)
         for user_id, num_tweets in users.items():
             try:
                 writer.writerow([user_id, num_tweets])
