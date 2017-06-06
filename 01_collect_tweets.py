@@ -9,6 +9,7 @@ the stream will disconnect and the script will end after an hour.
 Assumptions:
  - output directory for tweets is ../../../raid/RT82540; change appropriately
  - keywords of interest are "trump," "comey," etc.; change appropriately
+ - API authorization is properly setup
 """
 
 import os

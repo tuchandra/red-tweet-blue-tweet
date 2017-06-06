@@ -1,4 +1,4 @@
-"""Remove duplicate tweets, records that aren't tweets, and apply filters.
+"""Remove duplicate tweets, records that aren't tweets, and apply spam filters.
 
 We define "not tweets" as records which lack the "id" or "user" key.
 
@@ -10,15 +10,22 @@ We then keep tweets that have users for whom all of the following holds:
 
 This script assumes:
  - MongoDB is listening on localhost/27017
- - The database is called "twitter" with collections "tweets" (original)
-   and "tweets_filtered" (for after filtering)
+ - The database is called "twitter" with collection "tweets" (original), and
+   that collection "tweets_filtered" is the target (created if doesn't exist)
 """
 
 import pymongo
 
 
 def transfer_tweets(client, source, dest):
-    """Transfer tweets from source to dest collections. Apply above filters."""
+    """Transfer tweets from source to dest collections. Apply above filters.
+
+    Note: deletes tweets from source collection (after successful insertion)!
+
+    client: pymongo.MongoClient to connect to
+    source: source collection name
+    dest: target collection name
+    """
 
     i = 0
     for document in source.find(no_cursor_timeout = True):
@@ -48,7 +55,6 @@ def transfer_tweets(client, source, dest):
 
 if __name__ == "__main__":
     client = pymongo.MongoClient("localhost", 27017)
-    tweets = client["twitter"]["tweets"]
 
     # Create tweets_filtered (and index) if it doesn't exist
     if "tweets_filtered" not in client["twitter"].collection_names():
@@ -56,5 +62,6 @@ if __name__ == "__main__":
         tweets_filtered.create_index("id", unique = True)
 
     tweets_filtered = client["twitter"]["tweets_filtered"]
+    tweets = client["twitter"]["tweets"]
     
     transfer_tweets(client, tweets, tweets_filtered)

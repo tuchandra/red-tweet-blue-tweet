@@ -1,6 +1,8 @@
 """Write list of users who tweeted to a CSV, user_list.csv.
 
-Assumptions:
+The CSV has rows as (user id, number of times tweeted).
+
+This script assumes:
  - MongoDB is listening on localhost/27017
  - The database is called "twitter" with collection "tweets_filtered"
 """
@@ -39,5 +41,4 @@ def export_userlist(client, collection_name):
 
 if __name__ == "__main__":
     client = pymongo.MongoClient("localhost", 27017)
-
     export_userlist(client, "tweets_filtered")

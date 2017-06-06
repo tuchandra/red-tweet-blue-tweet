@@ -1,5 +1,15 @@
-"""Extract retweets from all of the filtered tweets.
+"""Extract retweets by date from all of the tweets in collection.
 
+Creates a CSV for each date, and includes the IDs of tweets that were
+retweeted on that date. Format is
+    (tweet_date, ID of the retweet, ID of original tweet)
+with the date formatted as YYYY_MM_DD.
+
+This script assumes:
+ - MongoDB is listening on localhost/27017
+ - The database of interest is called "twitter"
+ - The collection of interest is "tweets_filtered"
+ - Desired output directory is retweet_lists
 """
 
 import csv

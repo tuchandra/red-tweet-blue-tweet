@@ -1,4 +1,18 @@
-"""Get followers for a group of political accounts."""
+"""Collect lists of followers for a group of congresspeople and governors.
+
+We use CSPAN's lists on Twitter to track congresspeople and governors. This
+outputs a CSV file for each user, to followers_lists/{userid}.csv. It sleeps
+in between calls to avoid hitting the API rate limit (currently, 15 calls per
+15 minutes).
+
+It ignores users who:
+ - have usernames that cause Unicode errors
+ - users who have fewer than 5000 followers
+ - users who have more than 100000 followers
+
+Assumptions: 
+ - API authorization is properly setup
+"""
 
 
 import csv
@@ -18,7 +32,6 @@ def get_followers(auth):
     This considers the union of the following groups:
      - member of congress (from CSPAN's list on Twitter)
      - governors (from CSPAN's list on Twitter)
-     - other political accounts (from the paper and current events)
     
     Each gets written to a file "userid.csv".
     """
@@ -28,11 +41,6 @@ def get_followers(auth):
 
     congress = tweepy.Cursor(api.list_members, "cspan", "members-of-congress").items()
     governors = tweepy.Cursor(api.list_members, "cspan", "governors").items()
-#     other_accts = ["BarackObama", "JoeBiden", "realDonaldTrump", "POTUS",
-#                    "FLOTUS", "VP", "SecondLady", "WhiteHouse", "GOPLeader",
-#                    "PressSec", "BetsyDeVos", "MichelleObama", "BernieSanders",
-#                    "nytimes", "FoxNews", "NPR", "CNN", "NPR", "maddow",
-#                    "rushlimbaugh", "glennbeck"]
 
     all_accounts = itertools.chain(congress, governors)
 

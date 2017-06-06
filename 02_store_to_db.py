@@ -67,7 +67,11 @@ def copy_sample(client, source_name, dest_name, number = 10000):
 
 
 def count_distinct(client, col_name):
-    """Count the number of distinct tweets (by "id") in a collection."""
+    """Count the number of distinct tweets (by "id") in a collection.
+
+    client: pymongo.MongoClient to connect to
+    col_name: name of collection of interest
+    """
 
     collection = client["twitter"][col_name]
 
