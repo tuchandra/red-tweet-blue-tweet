@@ -56,15 +56,17 @@ y <- y[rowSums(y)>0,]  # (472,985 x 443)
 
 # Load column coordinates, but remove labels (443 x 3)
 colcoords <- matrix(as.matrix(col.df[,2:4]), ncol=3)
+gam.00 <- colcoords  # (443 x 3)
+
+# Compute column masses
+colmasses <- colSums(y) / sum(y)
+cs <- colmasses  # length 443
 
 # Matrix of singular values (472985, 3)
 # [[sigma1, sigma2, sigma3],
 #  [sigma1, sigma2, sigma3],
 #             ...          ]
 svphi <- matrix(res$sv[1:3], nrow = nrow(y), ncol = 3, byrow = TRUE)
-
-cs <- colmasses  # length 443
-gam.00 <- colcoords  # (443 x 3)
 
 points <- as.matrix(y) * 1  # (472985 x 443), and the *1 coerces to numeric
 rs.sum <- rowSums(points)  # length 472985
@@ -93,3 +95,64 @@ row.df <- data.frame(
     stringsAsFactors = FALSE)
 
 save(row.df, file = "row_coord.Rdata")
+
+
+#===============================================================
+# NORMALIZATION
+# Combine estimates of ideology for both rows (users) and
+# columns (politicians). This takes advantage of the structure
+# of the analysis, allowing us to use the same correspondence
+# analysis for two groups of people.
+# 
+# Normalize both sets of estimates; users should be normally
+# distributed on N(0, 1), while politicians should have sd = 1.
+#
+# Combine them, then save the output.
+#===============================================================
+
+# First, normalize the row estimates
+load("row_coord.Rdata")  # reload row.df
+
+# First singular value represents ideology
+users <- row.df
+names(users)[c(1, 2)] <- c("id", "ideology")
+
+# Keep relevant values
+users <- users[, c("id", "ideology", "sum")]
+users$type <- "users"
+users$party <- ""
+
+# Rescale to N(0, 1). Sort the users by their ideology first, then generate
+# values from N(0, 1), sort those, and assign them in turn to each user.
+users2 <- users[order(users$ideology + rnorm(length(users$ideology), 0, 0.05)),]
+
+p <- rnorm(nrow(users), 0, 1)
+p <- sort(p)
+users2$ideology <- p
+
+users <- users[,c("id", "ideology", "type", "party", "sum")]
+
+# Next, normalize column estimates
+load("output/col_coord.Rdata")  # reload col.df
+
+# Set up columns
+col.df$id <- col.df$colname
+col.df$ideology <- col.df$coord1
+col.df$sum <- 0
+col.df$party <- ""
+col.df$type <- "politicians"
+
+# Keep columns of interest
+politicians <- col.df[,c("id", "ideology", "type", "party", "sum")]
+
+# Rescale column ideologies to have standard deviation 1.
+# (Note res$rowcoord[,1] used to have user ideologies, since those were the
+# first singular values.)
+ratio <- sd(politicians$ideology) / sd(res$rowcoord[,1])
+politicians$ideology <- politicians$ideology / ratio
+
+# Combine datasets
+estimates <- rbind(politicians, users)
+estimates <- estimates[!duplicated(estimates$id),]
+
+save(estimates, file = "estimates.rdata")
