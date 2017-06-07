@@ -59,6 +59,8 @@ t <- table(p$ideology > 0.5, p$party == "R")
 # significantly for Democrats and Republicans in Congress.
 t.test(p[p$party == "R",]$ideology, p[p$party == "D",]$ideology, var.equal = TRUE)
 
+# t = 53.7
+# There is clearly a difference in our estimates, which is reassuring.
 
 
 #===============================================================
