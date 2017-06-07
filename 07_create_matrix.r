@@ -1,7 +1,7 @@
 #===============================================================
 # Create the adjacency matrix indicating which of our users
 # follow which politicians, and do the correspondence analysis
-# to generate the adjacency matrix.
+# to generate the projection matrix.
 #
 # This script assumes:
 #  - followers lists are stored in folder followers_lists/
@@ -74,8 +74,8 @@ save(x, file="adj_matrix.Rdata")
 
 #===============================================================
 # CORRESPONDENCE ANALYSIS
-# Construct the matrix of users who follow at least 5 of the
-# politicians identified above.
+# Take users who follow at least 5 of the politicians
+# identified above, then run correspondence analysis.
 #===============================================================
 
 x <- x[rowSums(x) > 4, ]
