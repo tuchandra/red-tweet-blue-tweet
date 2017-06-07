@@ -89,19 +89,20 @@ for (i in 1 : (length(files) - 1)) {  # the last file doesn't have enough data
     # Graph things!
     #
 
-    # Construct heatmap -- a great deal of this plot function is taken from
-    # the original authors
+    # Construct heatmap -- a great deal of this plot function is credited to
+    # the original authors, and the rest to StackOverflow and ggplot2 docs
     rt_table <- expand_data(retweets)
     date <- as.character(retweets[1, 3])
     date_name <- strftime(strptime(date, "%Y_%m_%d"), "%B %d")
     plt_title <- paste("Retweet Polarization on", date_name)
 
     plt <- ggplot(rt_table, aes(x=retweeted, y=retweeter)) +
-           geom_raster(aes(fill=prop), colour="white") +
-           scale_y_continuous(limits=c(-3,3), breaks=(-2:2), expand=c(0,0)) +
-           scale_x_continuous(limits=c(-3,3), breaks=(-2:2), expand=c(0,0)) + 
-           scale_fill_gradient(low="white", high="black", name="Proportion\nof tweets") +
-           theme(panel.background = element_rect(fill="white"), 
+           geom_raster(aes(fill=prop), color="white") +
+           scale_y_continuous(limits=c(-3,3), expand=c(0,0)) +
+           scale_x_continuous(limits=c(-3,3), expand=c(0,0)) +
+           scale_fill_gradient(low="white", high="black", name="Proportion\nof tweets",
+                               limits=c(0, 0.05), breaks=seq(0, 0.05, by=0.01)) +
+           theme(panel.background = element_rect(fill="white"),
                  panel.border = element_rect(fill=NA)) +
            labs(x="Ideology Estimate for Original Author",
                 y="Ideology Estimate for Retweeter",
