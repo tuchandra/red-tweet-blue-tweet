@@ -8,13 +8,15 @@
 library(reshape2)
 library(ggplot2)
 
+
 #===============================================================
-# Write a function
-# 
-# 
+# FORMAT_DATA: creates pairwise counts matrix of ideology pairs
+# for original author and retweeter, then coerce them into a
+# shape that is conducive to plotting later, and transform to
+# proportions.
 #===============================================================
 
-expand_data <- function(results, bin_size = 0.25, min = -4, max = -4) { # are min/max needed?
+format_data <- function(results, bin_size = 0.25) {
     # Axes will be ideologies
     retweeter <- results$ideology_retweeter
     retweeted <- results$ideology_retweeted
@@ -35,9 +37,11 @@ expand_data <- function(results, bin_size = 0.25, min = -4, max = -4) { # are mi
 
 
 #===============================================================
-# Make heatmaps on the daily
-# 
-# 
+# CREATE HEATMAPS
+# For each day of data, create a heatmap of the ideology pairs
+# described above. To do this, we combine the retweets extracted
+# ages ago with the estimates. The combined file is saved to
+# an Rdata to save future time.
 #===============================================================
 
 load("estimates.Rdata")
@@ -45,20 +49,16 @@ estimates <- estimates[, c("id", "ideology")]
 
 files <- list.files("retweet_lists/", full.names = TRUE)
 
-pol1 <- list()
-pol2 <- list()
-pol3 <- list()
-
-
-for (i in 1 : (length(files) - 1)) {  # the last file doesn't have enough data
+# Last file doesn't have enough data
+for (i in 1 : (length(files) - 1)) {
     retweets <- read.csv(files[i], header = FALSE, 
                          col.names = c("date", "retweeter", "rewtweeted"))
 
-    # Columns of retweets are "date" "retweeter" "retweeted", in that order
-    # We need to merge with the ideology estimates. 
+    # Columns of retweets are "date" "retweeter" "retweeted", in that order.
+    # We need to merge with the ideology estimates.
 
     # Set ID to retweeter, then join with the estimates, then reset names
-    # Note that the column positions change on the join. Unclear why.
+    # Note that the column positions change on the join. It is unclear why.
     names(retweets)[2] <- "id"
     retweets <- merge(retweets, estimates, by = "id")
     names(retweets)[1] <- "retweeter"
@@ -70,28 +70,16 @@ for (i in 1 : (length(files) - 1)) {  # the last file doesn't have enough data
     names(retweets)[1] <- "retweeted"
     names(retweets)[5] <- "ideology_retweeted"
 
-    #
-    # Compute assorted polarization indices.
-    #
-
-    # 1. Do the retweeter and original Twitter user share the same ideology?
-    # Both indices are centered at 0.5, so shift them and multiply, then check
-    # if the product is positive. Bools are 0 / 1, so mean gives the proportion.
-    pol1 <- mean((retweets$ideology_retweeter - 0.5) * (retweets$ideology_retweeter - 0.5) > 0)
-
-    # 2. How often were the two authors within 1 point of each other (1 SD)?
-    pol2 <- mean(abs(retweets$ideology_retweeter - retweets$ideology_retweeted) < 1)
-
-    # 3. Average polarization of information that is retweeted (from paper)?
-    pol3 <- mean(abs(retweets$ideology_retweeted - 0.5))
-
-    #
-    # Graph things!
-    #
+    # Save retweets + estimates dataframe for later (it is costly to compute)
+    date <- as.character(retweets[1, 3])
+    fname <- paste("retweet_lists/rt_est_", date, ".Rdata", sep = "")
+    save(retweets, file = fname)
 
     # Construct heatmap -- a great deal of this plot function is credited to
-    # the original authors, and the rest to StackOverflow and ggplot2 docs
-    rt_table <- expand_data(retweets)
+    # the original authors, and the rest to StackOverflow and ggplot2 docs.
+    rt_table <- format_data(retweets)
+
+    # Format date as, e.g., "May 12," for the title of the plot
     date <- as.character(retweets[1, 3])
     date_name <- strftime(strptime(date, "%Y_%m_%d"), "%B %d")
     plt_title <- paste("Retweet Polarization on", date_name)
