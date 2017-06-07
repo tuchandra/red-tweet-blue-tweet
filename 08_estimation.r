@@ -1,7 +1,7 @@
 #===============================================================
-# DO A THING MAYBE
-# UNCLEAR
-#
+# Estimate ideologies by projecting the users (rows) onto the
+# ideological subspace created from the previous script.
+# Normalize the ideological values to facilitate analysis.
 #
 # This script assumes:
 #  - adjacency matrix stored in adj_matrix.Rdata
@@ -15,34 +15,15 @@ load("correspondence.Rdata")  # matrix res
 
 #===============================================================
 # COLUMN PROJECTIONS
-# Project each column into the subspace; create matrix col.df
-# with dimension (443, 3) giving three coordinates for each col
+# This is mostly unnecessary, because we did not do a second
+# stage census to gather additional political accounts. Due
+# to this, there are no additional columns to project onto the
+# original subspace.
+#
+# We keep this section to remain consistent with the original
+# authors' work.
 #===============================================================
 
-# 
-# # Principal coordinates for rows
-# psi <- res$rowcoord  # 110824 x 3
-# 
-# # Normalize y, so that columns sum to 1
-# y.sum <- apply(y, 2, sum)  # flattens to 443-element list
-# ys <- y / matrix(y.sum, nrow=nrow(y), ncol=ncol(y), byrow=TRUE)
-# 
-# # Matrix of singular values (443, 3)
-# # [[sigma1, sigma2, sigma3],
-# #  [sigma1, sigma2, sigma3],
-# #             ...          ]
-# svgam <- matrix(res$sv[1:3], nrow=ncol(h), ncol=3, byrow=TRUE)
-# 
-# # Compute projection
-# # t(hs) is hs.transpose
-# # %*% is matrix multiplication
-# # t(hs) %*% psi is (443 x 110824) * (110824 x 3) = (443 x 3)
-# # Then divides elementwise by svgam, so g = (443 x 3)
-# g <- (t(hs) %*% Psi) / svgam
-# 
-
-# All of the above might have been unnecessary, because we don't have any
-# new columns from the second stage being projected onto first stage space.
 col.df <- data.frame(
     colname = res$colnames,
     coord1 = res$colcoord[,1],
@@ -54,14 +35,18 @@ save(col.df, file = "col_coord.Rdata")
 
 
 #===============================================================
-# PROJECT ROWS
+# ROW PROJECTIONS
+# This part is actually necessary. Because we identified the
+# ideological subspace as those users who follow at least 5
+# political accounts, we now need to account for those who
+# follow fewer than 5 (but still at least 1). 
 #
-# UNCLEAR
+# To do this, we project all of the rows into the subspace
+# created by the correspondence analysis. Some rows already
+# exist in the subspace (those users who follow 5 or more
+# politicians), but the projection for them is simply the
+# identity.
 #===============================================================
-
-# Note: We cannot simply take res$rowcoord, because we didn't use all of
-# the rows in computing the SVD (we used those who followed at least 5
-# politicians).
 
 load("adj_matrix.Rdata")  # reloads entire y
 load("col_coord.Rdata")
