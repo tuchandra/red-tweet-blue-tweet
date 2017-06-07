@@ -1,13 +1,10 @@
-"""Validate the ideology estimates of politicians.
+"""Collect Twitter IDs and party affiliations of congresspeople.
 
 We obtain the list of all Democrats and Republicans in Congress (both House
-and Senate), and plot their ideology scores from our model against their
-party affiliation.
-
-This should, in theory, show that our model is reasonably predictive of
-party affiliation.
+and Senate). This will later be used to validate our model.
 """
 
+import csv
 import itertools
 
 import tweepy
@@ -40,16 +37,18 @@ def write_users(users, party):
     # Write to appropriate file
     if party == "R":
         fname = "congress_republicans.csv"
-    else if party == "D":
+    elif party == "D":
         fname = "congress_democrats.csv"
 
     with open(fname, "w") as outfile:
         writer = csv.writer(outfile)
         for acct_info in accounts:
             try:
-                writer.writerow(acct)
+                writer.writerow(acct_info)
             except:
                 continue
+
+        print("Wrote list to {}".format(fname))
 
 
 def get_congresspeople(auth):
@@ -61,7 +60,7 @@ def get_congresspeople(auth):
     # List of all Republicans in Congress from @SenateRepublicans and 
     # @HouseRepublicans
     house_reps = tweepy.Cursor(api.list_members, "HouseGOP", "house-republicans").items()
-    senate_reps = tweepy.Cursor(api.list_members, "SenateGOP", "senate-republicans").items()
+    senate_reps = tweepy.Cursor(api.list_members, "senategop", "senaterepublicans").items()
 
     republicans = itertools.chain(house_reps, senate_reps)
     write_users(republicans, "R")
