@@ -66,11 +66,11 @@ rows <- unlist(rows)
 columns <- unlist(columns)
 
 # Prepare matrix. Rows are users from our collection; columns are politicians.
-x <- sparseMatrix(i = rows, j = columns)
-rownames(x) <- users[1:n]
-colnames(x) <- census[1:m]
+y <- sparseMatrix(i = rows, j = columns)
+rownames(y) <- users[1:dim(y)[1]]
+colnames(y) <- census[1:m]
 
-save(x, file="adj_matrix.Rdata")
+save(y, file="adj_matrix.Rdata")
 
 #===============================================================
 # CORRESPONDENCE ANALYSIS
@@ -78,8 +78,8 @@ save(x, file="adj_matrix.Rdata")
 # identified above, then run correspondence analysis.
 #===============================================================
 
-x <- x[rowSums(x) > 4, ]
-x <- as.matrix(x)
-result <- ca(x, nd = 3)
+y <- y[rowSums(y) > 4, ]
+y <- as.matrix(y)
+res <- ca(y, nd = 3)
 
-save(result, file="correspondence.Rdata")
+save(res, file="correspondence.Rdata")
