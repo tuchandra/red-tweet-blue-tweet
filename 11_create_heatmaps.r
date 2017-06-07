@@ -77,7 +77,7 @@ for (i in 1 : (length(files) - 1)) {
 
     # Save retweets + estimates dataframe for later (it is costly to compute)
     date <- as.character(retweets[1, 3])
-    fname <- paste("retweet_lists/rt_est_", date, ".Rdata", sep = "")
+    fname <- paste("retweet_estimates/", date, ".Rdata", sep = "")
     save(retweets, file = fname)
 
     # Construct heatmap -- a great deal of this plot function is credited to
