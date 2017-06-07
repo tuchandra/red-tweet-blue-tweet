@@ -1,9 +1,14 @@
 #===============================================================
-# Do a thing, probably
+# Combine the lists of retweets from earlier with the ideology
+# estimates we just created. Use these to generate heatmaps
+# of the ideology pairs of the retweet network for each day.
 #
-# - files stored
-# - estimates
+# Assumptions
+#  - Retweets are stored in retweets_lists/
+#  - Estimates are stored in estimates.Rdata
+#  - Output folder plots/ exists
 #===============================================================
+
 
 library(reshape2)
 library(ggplot2)
