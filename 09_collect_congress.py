@@ -2,6 +2,9 @@
 
 We obtain the list of all Democrats and Republicans in Congress (both House
 and Senate). This will later be used to validate our model.
+
+Assumptions: 
+ - API authorization is properly setup
 """
 
 import csv
