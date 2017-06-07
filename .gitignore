@@ -1,13 +1,27 @@
-# Credentials, data, papers
+# Folders of author's data
+data_anonymization/
+authors_temp/
+output_original/
+
+# Credentials
 credentials.json
-*.txt
-*.pdf
 
-# Tweet and user data
-*.json
+# Utilities
+job.sh
+schedule.sh
+
+# Data and output files
+*.Rdata
 *.csv
+*.txt
+tweets/
 
+# Other R stuff
+.RData
 .Rhistory
+Rplots.pdf
+
+### ORIGINAL FILES
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
