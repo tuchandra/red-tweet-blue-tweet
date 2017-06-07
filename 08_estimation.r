@@ -50,7 +50,7 @@ col.df <- data.frame(
     coord3 = res$colcoord[,3],
     stringsAsFactors = FALSE)
 
-save(col.df, file="col_coord.Rdata")
+save(col.df, file = "col_coord.Rdata")
 
 
 #===============================================================
@@ -107,4 +107,4 @@ row.df <- data.frame(
     sum = rowSums(y),
     stringsAsFactors = FALSE)
 
-save(row.df, file='output/row_coord.Rdata')
+save(row.df, file = "row_coord.Rdata")
