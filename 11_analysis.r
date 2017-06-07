@@ -50,7 +50,7 @@ pol2 <- list()
 pol3 <- list()
 
 
-for (i in 1 : length(files) - 1) {  # the last file doesn't have enough data
+for (i in 1 : (length(files) - 1)) {  # the last file doesn't have enough data
     retweets <- read.csv(files[i], header = FALSE, 
                          col.names = c("date", "retweeter", "rewtweeted"))
 
@@ -78,7 +78,6 @@ for (i in 1 : length(files) - 1) {  # the last file doesn't have enough data
     # Both indices are centered at 0.5, so shift them and multiply, then check
     # if the product is positive. Bools are 0 / 1, so mean gives the proportion.
     pol1 <- mean((retweets$ideology_retweeter - 0.5) * (retweets$ideology_retweeter - 0.5) > 0)
-    pol1
 
     # 2. How often were the two authors within 1 point of each other (1 SD)?
     pol2 <- mean(abs(retweets$ideology_retweeter - retweets$ideology_retweeted) < 1)
@@ -90,12 +89,25 @@ for (i in 1 : length(files) - 1) {  # the last file doesn't have enough data
     # Graph things!
     #
 
-    # Construct heatmap
+    # Construct heatmap -- a great deal of this plot function is taken from
+    # the original authors
     rt_table <- expand_data(retweets)
-    plt <- ggplot(rt_table, aes(x=retweeted, y=retweeter)) + geom_tile(aes(fill=prop))
+    date <- as.character(retweets[1, 3])
+    date_name <- strftime(strptime(date, "%Y_%m_%d"), "%B %d")
+    plt_title <- paste("Retweet Polarization on", date_name)
+
+    plt <- ggplot(rt_table, aes(x=retweeted, y=retweeter)) +
+           geom_raster(aes(fill=prop), colour="white") +
+           scale_y_continuous(limits=c(-3,3), breaks=(-2:2), expand=c(0,0)) +
+           scale_x_continuous(limits=c(-3,3), breaks=(-2:2), expand=c(0,0)) + 
+           scale_fill_gradient(low="white", high="black", name="Proportion\nof tweets") +
+           theme(panel.background = element_rect(fill="white"), 
+                 panel.border = element_rect(fill=NA)) +
+           labs(x="Ideology Estimate for Original Author",
+                y="Ideology Estimate for Retweeter",
+                title=plt_title)
 
     # Save plot
-    date <- as.character(retweets[1, 3])
     fname = paste("plots/heatmap_", date, ".png", sep="")
-    ggsave(filename = fname, plot = plt)
+    ggsave(filename = fname, plot = plt, width=4, height=4)
 }
