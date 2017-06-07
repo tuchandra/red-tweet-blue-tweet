@@ -76,6 +76,7 @@ save(y, file="adj_matrix.Rdata")
 # CORRESPONDENCE ANALYSIS
 # Take users who follow at least 5 of the politicians
 # identified above, then run correspondence analysis.
+# Matrix "res" is S (standardized residuals)
 #===============================================================
 
 y <- y[rowSums(y) > 4, ]
