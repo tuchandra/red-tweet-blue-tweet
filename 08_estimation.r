@@ -6,7 +6,6 @@
 # This script assumes:
 #  - adjacency matrix stored in adj_matrix.Rdata
 #  - correspondence analysis result stored in correspondence.Rdata
-#
 #===============================================================
 
 library(Matrix)
@@ -133,7 +132,7 @@ users2$ideology <- p
 users <- users[,c("id", "ideology", "type", "party", "sum")]
 
 # Next, normalize column estimates
-load("output/col_coord.Rdata")  # reload col.df
+load("col_coord.Rdata")  # reload col.df
 
 # Set up columns
 col.df$id <- col.df$colname
@@ -155,4 +154,9 @@ politicians$ideology <- politicians$ideology / ratio
 estimates <- rbind(politicians, users)
 estimates <- estimates[!duplicated(estimates$id),]
 
-save(estimates, file = "estimates.rdata")
+# Ideologies are backwards, due to the reflectional invariance of the
+# method we used. Multiply by -1 to make liberals have negative values (more
+# "left") and Republicans positive ones.
+estimates$ideology <- estimates$ideology * -1
+
+save(estimates, file = "estimates.Rdata")
