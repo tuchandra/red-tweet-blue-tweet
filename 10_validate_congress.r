@@ -68,7 +68,7 @@ t.test(p[p$party == "R",]$ideology, p[p$party == "D",]$ideology, var.equal = TRU
 #===============================================================
 
 # Boxplot
-plt <- ggplot(p, aes(x = party, y = ideology)) + 
+plt <- ggplot(p, aes(x = party, y = ideology)) +
        geom_boxplot(fill="lightblue") +
        labs(title="Ideology Estimates of Members of Congress",
             x="Party Affiliation", y="Ideology Estimate") +
@@ -79,8 +79,10 @@ ggsave(f = "plots/congress_boxplot.png", plot = plt, height = 3, width = 8)
 # Jitter plot
 plt <- ggplot(p, aes(x = party, y = ideology)) +
        geom_jitter(aes(color=party)) +
-       labs(title="Ideology Estimates of Members of Congress", 
+       labs(title="Ideology Estimates of Members of Congress",
             x="Party Affiliation", y="Ideology Estimate") +
-       theme(legend.position="none") + coord_flip()
+       theme(legend.position="none") +
+       scale_color_manual(values=c("slateblue1", "firebrick1")) +
+       coord_flip()
 
 ggsave(f = "plots/congress_jitter.png", plot = plt, height = 3, width = 8)
