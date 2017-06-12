@@ -41,7 +41,7 @@ This graph makes it apparent that political polarization increases over time. Th
 This project was completed for the [Seminar on Algorithms and Society](http://www.psacomputing.org/algsoc/basics/) course at Northwestern, taught by Prof. Brent Hecht. My work was based on the paper authored by Pablo Barbera at NYU:
 
 ```
-Barberá, Pablo, et al. "Tweeting from left to right: Is online political communication more than an echo chamber?." *Psychological science* 26.10 (2015): 1531-1542.
+Barberá, Pablo, et al. "Tweeting from left to right: Is online political communication more than an echo chamber?." Psychological science 26.10 (2015): 1531-1542.
 ```
 
 In addition, a great deal of my code was based off [theirs](https://github.com/pablobarbera/echo_chambers), for which I am grateful.
