@@ -12,7 +12,15 @@ This project has three phases: **data collection**, **ideology estimation**, and
  * **Polarization Analysis**: developing measures of political polarization over time and analyzing them.
 
 ## Methods
-Coming soon!
+### Data Collection
+This phase uses code from files 01_collect_tweets.py through 05_extract_retweets.py. We collected 53 million tweets from 5/10/17 through 5/30/17, focusing on this event. We stored them into a database, then applied spam and activity filters to them. This gave us a corpus of 36 million tweets.
+
+From here, we extracted **27 million retweets**, and the **3 million Twitter users** who were involved in these retweets. This body of retweets and population of users comprised the subject of the following analyses.
+
+### Ideology Estimation
+
+
+### Polarization Analysis
 
 ## Acknowledgements
 This project was completed for the [Seminar on Algorithms and Society](http://www.psacomputing.org/algsoc/basics/) course at Northwestern, taught by Prof. Brent Hecht. My work was based on the paper authored by Pablo Barbera, a member of the Social Media and Political Participation Lab at NYU:
