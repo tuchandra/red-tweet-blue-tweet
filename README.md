@@ -2,7 +2,7 @@
 A data science project studying political polarization on Twitter in May 2017.
 
 ## Overview
-![Polarization over time](plots/polarize3.png)
+<img src="https://github.com/tuchandra/red-tweet-blue-tweet/blob/master/plots/polarize3.png?raw=true" width="600" height="400">
 
 This is a research project aimed at studying political polarization on Twitter. We focus our attention on the polarization observed in the aftermath of President Trump firing FBI Director James Comey.
 
