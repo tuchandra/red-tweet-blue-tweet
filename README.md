@@ -18,7 +18,13 @@ This phase uses code from files 01_collect_tweets.py through 05_extract_retweets
 From here, we extracted **27 million retweets**, and the **3 million Twitter users** who were involved in these retweets. This body of retweets and population of users comprised the subject of the following analyses.
 
 ### Ideology Estimation
+This uses code from files 06_collect_followers.py through 10_validate_congress.r. We estimated the political ideology of the 3 million twitter users through a technique called correspondence analysis. We considered which of our users followed 443 political actors (members of Congress and state governors), and used this to predict the ideologies of both our population and of the politicians.
 
+Note that we never explicitly identified any individual's ideology. Therefore, to validate our model, it is statistically sound to compare the estimated ideology of members of Congress with their actual political party:
+
+![Ideology of Congress](plots/congress_jitter.png)
+
+We see that the estimated ideology strongly correlates with the traditional United States political parties.
 
 ### Polarization Analysis
 
