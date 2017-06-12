@@ -4,12 +4,12 @@ A data science project studying political polarization on Twitter in May 2017.
 ## Overview
 <img src="https://github.com/tuchandra/red-tweet-blue-tweet/blob/master/plots/polarize3.png?raw=true" width="600" height="400">
 
-This is a research project aimed at studying political polarization on Twitter. We focus our attention on the polarization observed in the aftermath of President Trump firing FBI Director James Comey.
+This is a research project aimed at studying political polarization on Twitter. We focus our attention on the trends observed in the aftermath of President Trump firing FBI Director James Comey, or from May 10th through 29th..
 
-This project has three phases: **data collection**, **ideology estimation**, and **polarization analysis**. These can loosely be described by:
- * **Data Collection**: collecting tweets on this event and extracting the retweets and the population of users associated with them.
- * **Ideology Estimation**: estimating the political ideologies of our population through correspondence analysis, and verifying that this ideology is meaningful.
- * **Polarization Analysis**: developing and calculating measures of political polarization over time.
+This project has three phases: **data collection**, **ideology estimation**, and **polarization analysis**. At a high level, these are described by:
+ * **Data Collection**: collecting tweets on this event, and extracting the retweets and the population of users associated with them.
+ * **Ideology Estimation**: estimating the political ideologies of the population through correspondence analysis, and verifying that this ideology is meaningful.
+ * **Polarization Analysis**: developing measures of political polarization over time and analyzing them.
 
 ## Methods
 Coming soon!
